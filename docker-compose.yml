@@ -1,0 +1,63 @@
+services:
+  django:
+    image: django-observability:latest
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    volumes:
+      - django-db:/django/observability/db/
+    environment:
+      - OTLP_TRACE_ENDPOINT=http://otel:4318/v1/traces
+  nginx:
+    image: nginx:1.28.0-otel
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./docker/nginx:/etc/nginx
+    depends_on:
+      - django
+  otel:
+    image: otel/opentelemetry-collector-contrib:0.126.0
+    volumes:
+      - ./docker/otel/config.yaml:/etc/otelcol-contrib/config.yaml
+    restart: unless-stopped
+    depends_on:
+      - clickhouse
+  clickhouse:
+    image: clickhouse:25.4.2.31
+    environment:
+      - CLICKHOUSE_DB=default
+      - CLICKHOUSE_USER=default
+      - CLICKHOUSE_PASSWORD=default
+      - CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT=1
+    volumes:
+      - clickhouse-db:/var/lib/clickhouse
+    ports:
+      - 127.0.0.1:8123:8123
+  grafana:
+    image: grafana/grafana:12.0.0
+    ports:
+      - 3000:3000
+    environment:
+      - GF_LOG_LEVEL=info
+      - GF_SERVER_ROOT_URL=http://localhost:3000
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_SERVER_PROTOCOL=http
+      - GF_SERVER_HTTP_ADDR=0.0.0.0
+      - GF_SERVER_HTTP_PORT=3000
+    volumes:
+      - ./docker/grafana:/var/lib/grafana
+  jaeger:
+    image: quay.io/jaegertracing/all-in-one:1.69.0
+    ports:
+      - 16686:16686
+    depends_on:
+      - otel
+
+volumes:
+  django-db:
+  clickhouse-db:
+    
+      

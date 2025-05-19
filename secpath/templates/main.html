@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Текст для степей</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Marck+Script&family=Rubik+Moonrocks&display=swap');
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #cbeefa;
+      background-image: url('https://upload.wikimedia.org/wikipedia/commons/8/84/Kazakh_Ornament_Pattern.png');
+      background-size: 300px;
+      background-repeat: repeat;
+      background-attachment: fixed;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.96);
+      padding: 2rem;
+      border-radius: 20px;
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+      max-width: 600px;
+      width: 100%;
+      position: relative;
+      border: 4px double #ffcc00;
+    }
+
+    h2 {
+      margin-top: 0;
+      text-align: center;
+      font-family: 'Rubik Moonrocks', cursive;
+      font-size: 2.2rem;
+      color: #0077b6;
+      position: relative;
+      padding-bottom: 0.5rem;
+    }
+
+    h2::before {
+      content: '';
+      background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/f/fd/Emblem_of_Kazakhstan.svg/240px-Emblem_of_Kazakhstan.svg.png');
+      background-size: contain;
+      background-repeat: no-repeat;
+      display: block;
+      width: 50px;
+      height: 50px;
+      margin: 0 auto 10px auto;
+    }
+
+    label {
+      font-weight: bold;
+    }
+
+    textarea {
+      width: 100%;
+      height: 150px;
+      padding: 1rem;
+      font-size: 1rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      resize: vertical;
+      box-sizing: border-box;
+    }
+
+    select, button {
+      padding: 0.75rem 1rem;
+      font-size: 1rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      margin-top: 1rem;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    button {
+      background-color: #ffcc00;
+      color: #003366;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #e6b800;
+    }
+
+    .expiration-time {
+      margin-top: 1rem;
+      text-align: center;
+      color: #004d80;
+      font-weight: bold;
+    }
+
+    .response-message {
+      margin-top: 1rem;
+      text-align: center;
+      color: #007a33;
+      font-weight: bold;
+    }
+
+    .share-link {
+      display: block;
+      margin-top: 0.5rem;
+      text-align: center;
+      color: #005fa3;
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    .share-link:hover {
+      text-decoration: underline;
+    }
+
+    .footer {
+      margin-top: 2rem;
+      text-align: center;
+      font-family: 'Marck Script', cursive;
+      font-size: 1.5rem;
+      color: #006699;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Текст для степей</h2>
+    <form id="textForm">
+      <!-- CSRF Token -->
+      {% csrf_token %}
+
+      <label for="text">Введите текст:</label><br>
+      <textarea id="text" name="text" placeholder="Напиши что-нибудь..."></textarea><br>
+
+      <label for="expiration">Срок действия:</label><br>
+      <select id="expiration" name="expiration">
+        <option value="5">5 min</option>
+        <option value="15">15 min</option>
+        <option value="30">30 min</option>
+        <option value="60">1h</option>
+      </select><br>
+
+      <div id="expirationResult" class="expiration-time"></div>
+
+      <button type="submit">Отправить</button>
+    </form>
+
+    <div id="responseMessage" class="response-message" style="display: none;"></div>
+    <!-- Вместо <a> теперь div для копирования ссылки -->
+    <textarea id="shareLink" class="share-link" readonly style="display:none; cursor:pointer; user-select: all;" rows="2"></textarea>
+    <div id="copyNotification" style="display:none; text-align:center; color: green; font-weight: bold; margin-top: 0.5rem;">Скопировано!</div>
+
+    <div class="footer">Жаса, Қазақстан!</div>
+  </div>
+
+  <script>
+    const expirationSelect = document.getElementById('expiration');
+    const resultDiv = document.getElementById('expirationResult');
+    const form = document.getElementById('textForm');
+    const csrfToken = document.querySelectorAll('[name="csrfmiddlewaretoken"]')[0].value;
+    const responseMessage = document.getElementById('responseMessage');
+    const shareLink = document.getElementById('shareLink');
+
+    function updateExpirationTime() {
+      const now = new Date();
+      const minutesToAdd = parseInt(expirationSelect.value);
+      const expirationTime = new Date(now.getTime() + minutesToAdd * 60000);
+
+      const options = {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      };
+
+      resultDiv.textContent = `Срок действия истекает: ${expirationTime.toLocaleString('ru-RU', options)}`;
+    }
+
+    expirationSelect.addEventListener('change', updateExpirationTime);
+    window.addEventListener('DOMContentLoaded', updateExpirationTime);
+form.addEventListener('submit', function (e) {
+  e.preventDefault(); // Prevent default GET behavior
+
+  const text = document.getElementById('text').value;
+  const expiration = document.getElementById('expiration').value;
+
+  fetch('/secpath/', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRFToken': csrfToken,
+    },
+    body: JSON.stringify({ text, expiration })
+  })
+  .then(response => {
+    if (!response.ok) throw new Error("Server error");
+    return response.json();
+  })
+  .then(data => {
+  if (data.message && data.share_url) {
+    responseMessage.textContent = 'Сообщение принято!';
+    
+    const shareLinkTextarea = document.getElementById('shareLink');
+    shareLinkTextarea.value = data.share_url;
+    shareLinkTextarea.style.display = 'block';
+    
+    shareLinkTextarea.addEventListener('click', () => {
+    shareLinkTextarea.focus();
+    shareLinkTextarea.select();
+
+    // Небольшая задержка, чтобы выделение точно произошло до копирования
+    setTimeout(() => {
+      navigator.clipboard.writeText(shareLinkTextarea.value).then(() => {
+        copyNotification.style.display = 'block';
+        setTimeout(() => {
+          copyNotification.style.display = 'none';
+        }, 1500);
+      }).catch(err => {
+        alert('Ошибка копирования: ' + err);
+      });
+    }, 100);
+    });
+
+    responseMessage.style.display = 'block';
+    form.reset();
+    updateExpirationTime();
+
+  } else {
+    responseMessage.textContent = 'Ошибка: сервер вернул некорректный ответ.';
+    responseMessage.style.display = 'block';
+    document.getElementById('shareLink').style.display = 'none';
+  }
+  })
+  .catch(error => {
+    console.error('Ошибка:', error);
+    responseMessage.textContent = 'Ошибка подключения к серверу.';
+    responseMessage.style.display = 'block';
+    shareLink.style.display = 'none';
+  });
+});
+
+  </script>
+</body>
+</html>

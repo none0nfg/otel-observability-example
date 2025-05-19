@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Ваше сообщение</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Marck+Script&family=Rubik+Moonrocks&display=swap');
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f0f8ff;
+      background-image: url('https://upload.wikimedia.org/wikipedia/commons/8/84/Kazakh_Ornament_Pattern.png');
+      background-size: 300px;
+      background-repeat: repeat;
+      background-attachment: fixed;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    .message-container {
+      background: rgba(255, 255, 255, 0.96);
+      padding: 2rem;
+      border-radius: 20px;
+      max-width: 700px;
+      width: 100%;
+      border: 4px double #ffcc00;
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    h2 {
+      font-family: 'Rubik Moonrocks', cursive;
+      color: #0077b6;
+    }
+
+    .message-box {
+      background-color: #eef;
+      padding: 1rem;
+      border: 2px solid #0077b6;
+      border-radius: 12px;
+      font-size: 1.1rem;
+      white-space: pre-wrap;
+      word-break: break-word;
+      margin-bottom: 1rem;
+    }
+
+    .expires {
+      color: #004d80;
+      font-weight: bold;
+    }
+
+    .footer {
+      margin-top: 2rem;
+      font-family: 'Marck Script', cursive;
+      font-size: 1.5rem;
+      color: #006699;
+    }
+  </style>
+</head>
+<body>
+  <div class="message-container">
+    <h2>Сообщение из степей</h2>
+
+    <div class="message-box" id="messageText">Загрузка...</div>
+    <div class="expires" id="expires">⏳</div>
+
+    <div class="footer">🇰🇿 Жаса, Қазақстан!</div>
+  </div>
+
+  <script>
+    // Эти данные вы можете заменить данными, которые отдает сервер (например, Django context)
+    const messageData = {
+      text: "{{ message }}", // Пример Django-переменной
+      expires: "{{ expires }}"    // Пример Django-переменной
+    };
+
+    document.getElementById("messageText").textContent = messageData.text;
+    document.getElementById("expires").textContent = "Истекает: " + messageData.expires;
+  </script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+.venv/
+__pycache__/
+*.py[cod]
+db.sqlite3
+db/db.sqlite3
+docker/Dockerfile
+docker/grafana
+docker/otel
+docker/nginx
+docker-compose.yml
