@@ -2,6 +2,7 @@ FROM python:3.12.3
 
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
+
 ENV DJANGO_SETTINGS_MODULE="observability.settings"
 
 WORKDIR /django/observability/

@@ -17,7 +17,6 @@ def link(request, rand=None):
     entry = get_object_or_404(Entry, link=(request.scheme + "://" + request.META.get('HTTP_HOST') + "/secpath/d/" + rand))
     return render(request, 'link.html', {"message": entry.data, "expires": entry.expire})
     
-
 def main(request):
     response = HttpResponse()
     logger.warning("Got request")

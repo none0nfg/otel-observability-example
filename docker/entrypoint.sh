@@ -11,12 +11,12 @@ cd "$DJANGO_ROOT" || exit 1
 
 # Make and apply migrations
 echo "Making migrations..."
-python manage.py makemigrations
+python3 manage.py makemigrations
 
 echo "Applying migrations..."
-python manage.py migrate
+python3 manage.py migrate
 
-sleep 10 && echo "[Cleanup] Starting cleaner" && python manage.py process_tasks &
+sleep 10 && echo "[Cleanup] Starting cleaner" && python manage.py process_tasks --verbosity=3 &
 
 # Run additional command passed to the script
 if [ "$#" -gt 0 ]; then

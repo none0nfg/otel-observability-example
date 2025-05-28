@@ -5,6 +5,12 @@ receivers:
         endpoint: 0.0.0.0:4317
       http:
         endpoint: 0.0.0.0:4318
+  prometheus_simple:
+    collection_interval: 15s
+    endpoint: 'django'
+    tls:
+      insecure_skip_verify: true
+
 processors:
   batch:
 
@@ -13,6 +19,9 @@ exporters:
     endpoint: jaeger:4317
     tls:
       insecure: true
+
+  prometheusremotewrite:
+    endpoint: http://prometheus:9090/api/v1/write
     
   clickhouse:
     endpoint: tcp://default:default@clickhouse:9000?dial_timeout=10s&compress=lz4&async_insert=1
@@ -44,9 +53,9 @@ service:
       processors: [batch]
       exporters: [clickhouse, otlp/jaeger]
     metrics:
-      receivers: [otlp]
-      processors: [batch]
-      exporters: [clickhouse]
+      receivers: [prometheus_simple]
+      processors: []
+      exporters: [prometheusremotewrite]
     logs:
       receivers: [otlp]
       processors: [batch]

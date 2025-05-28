@@ -12,3 +12,5 @@ All interesting services will be exposed to your localhost interface:
 * http://localhost/secpath/ - Application (Nginx that will proxy request)
 * http://localhost:3000/    - Grafana (To check logs, metrics, and some traces) <b>admin:admin</b>
 * http://localhost:16686/   - Jaeger (Pretty nice visualization of traces)
+* http://localhost:81/      - sqlite Browser, to explore data in django app
+* http://localhost:9090/    - Prometheus with metrics from django
